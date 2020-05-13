@@ -10,6 +10,7 @@ import cmath
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 from collections import Counter
 
@@ -30,23 +31,19 @@ def find_neighbour(graph, prev_fitness):
 def build_degree_frequency_plot(degree_sequence):
   degreeCount = Counter(degree_sequence)
   deg, cnt = zip(*degreeCount.items())
-
   fig, ax = plt.subplots()
-  plt.bar(deg, cnt, width=0.80, color='b', log=True)
+  plt.loglog(np.log1p(deg[::-1]), cnt[::-1], 'b-', marker='o')
 
-  plt.title("Degree Histogram")
+  plt.title("Degree Plot")
   plt.ylabel("Count")
   plt.xlabel("Degree")
-  ax.set_xticks([d + 0.4 for d in deg])
-  ax.set_xticklabels(deg)
 
   plt.show()
 
 
 def build_degree_rank_plot(degree_sequence):
-  dmax = max(degree_sequence)
+  plt.loglog(np.log1p(degree_sequence), 'b-', marker='o')
 
-  plt.loglog(degree_sequence, 'b-', marker='o')
   plt.title("Degree rank plot")
   plt.ylabel("degree")
   plt.xlabel("rank")
@@ -65,10 +62,14 @@ def main():
     graph.add_node(new_node)
     graph.add_edge(new_node, node_neighbour)
 
-  
   degree_sequence = sorted(dict(graph.degree()).values(), reverse=True)
   build_degree_frequency_plot(degree_sequence)
   build_degree_rank_plot(degree_sequence)
+
+  # build graph
+  plt.figure(figsize=(20,20))
+  nx.draw(graph, pos=nx.kamada_kawai_layout(graph)) 
+  plt.show()
 
 
 if __name__ == '__main__':
